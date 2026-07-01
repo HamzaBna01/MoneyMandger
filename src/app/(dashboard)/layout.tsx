@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { requireHousehold } from "@/lib/session";
+import { materializeDueRules } from "@/lib/recurring";
 import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Logo } from "@/components/logo";
@@ -17,7 +18,11 @@ export default async function DashboardLayout({
   // Opt out of prerendering — this subtree depends on the incoming request
   // (session cookie) and must never be statically baked as a redirect.
   await connection();
-  const { userName, userEmail, household } = await requireHousehold();
+  const { userName, userEmail, household, householdId } = await requireHousehold();
+
+  // Materialize recurring transactions automatically the next time the dashboard
+  // is loaded so rules are processed without any manual action.
+  await materializeDueRules(householdId);
 
   return (
     <div className="flex min-h-screen">
@@ -42,7 +47,11 @@ export default async function DashboardLayout({
         </main>
       </div>
 
-      <BottomNav />
+      <BottomNav
+        userName={userName}
+        userEmail={userEmail}
+        householdName={household.name}
+      />
     </div>
   );
 }

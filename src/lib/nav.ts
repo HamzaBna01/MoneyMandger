@@ -15,16 +15,16 @@ import {
 export interface NavItem {
   href: string;
   labelKey:
-    | "dashboard"
-    | "transactions"
-    | "accounts"
-    | "budgets"
-    | "categories"
-    | "reports"
-    | "recurring"
-    | "settings"
-    | "home"
-    | "activity";
+  | "dashboard"
+  | "transactions"
+  | "accounts"
+  | "budgets"
+  | "categories"
+  | "reports"
+  | "recurring"
+  | "settings"
+  | "home"
+  | "activity";
   icon: LucideIcon;
 }
 
@@ -43,6 +43,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/", labelKey: "home", icon: LayoutDashboard },
   { href: "/transactions", labelKey: "activity", icon: ArrowLeftRight },
+  { href: "/accounts", labelKey: "accounts", icon: Wallet },
   { href: "/budgets", labelKey: "budgets", icon: Target },
-  { href: "/settings", labelKey: "settings", icon: Settings },
+  { href: "/recurring", labelKey: "recurring", icon: Repeat },
 ];
