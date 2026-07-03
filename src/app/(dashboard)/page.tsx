@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Wallet, TrendingUp, TrendingDown, Plus, ArrowRight } from "lucide-react";
-import { requireHousehold } from "@/lib/session";
+import { requireHousehold, canWrite } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { monthRange, previousMonthRange } from "@/lib/dates";
 import {
@@ -19,6 +19,7 @@ import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { fmt } from "@/lib/i18n/interpolate";
 import { MetricCard, type MetricDelta } from "@/components/metric-card";
 import { SavingsCard } from "@/components/savings-card";
+import { PrimaryAccountCard } from "@/components/primary-account-card";
 import { TransactionRow } from "@/components/transaction-row";
 import { BudgetBar } from "@/components/budget-bar";
 import { TopSpendingCard } from "@/components/top-spending-card";
@@ -44,6 +45,7 @@ export default async function DashboardPage() {
     savings,
     savingsAvg,
     topCategories,
+    primaryAccount,
   ] = await Promise.all([
       totalBalance(householdId),
       incomeExpenseTotals(householdId, start, end),
@@ -62,6 +64,10 @@ export default async function DashboardPage() {
       savingsBalance(householdId),
       monthlySavingsAverage(householdId),
       topSpendingCategories(householdId, start, end),
+      prisma.account.findFirst({
+        where: { householdId, isPrimary: true },
+        select: { name: true, type: true, balanceCents: true },
+      }),
     ]);
 
   const savingsProjection = buildSavingsProjection({
@@ -69,6 +75,7 @@ export default async function DashboardPage() {
     monthlyAvgCents: savingsAvg,
     monthlyTargetCents: household.savingsMonthlyCents,
     goalDeadline: household.savingsGoalDeadline,
+    goalBaselineCents: household.savingsGoalBaselineCents,
   });
 
   // Month-over-month deltas. `higherIsGood` flips the colour: more income is
@@ -131,6 +138,13 @@ export default async function DashboardPage() {
           delta={spentDelta}
         />
       </div>
+
+      <PrimaryAccountCard
+        account={primaryAccount}
+        currency={currency}
+        canEdit={canWrite(role)}
+        dict={dict}
+      />
 
       <SavingsCard
         projection={savingsProjection}

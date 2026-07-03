@@ -44,6 +44,11 @@ enum BudgetPeriod {
   MONTHLY
 }
 
+enum AuthEventType {
+  LOGIN
+  LOGOUT
+}
+
 enum Cadence {
   DAILY
   WEEKLY
@@ -57,6 +62,10 @@ model Household {
   baseCurrency        String    @default("MAD")
   savingsMonthlyCents Int?
   savingsGoalDeadline DateTime?
+  // Savings balance captured when the goal was set. Goal progress counts only
+  // what's saved *after* this point, so money already set aside doesn't
+  // pre-fill the bar.
+  savingsGoalBaselineCents Int?
   createdAt           DateTime  @default(now())
 
   memberships    Membership[]
@@ -77,6 +86,21 @@ model User {
 
   memberships  Membership[]
   transactions Transaction[] @relation("EnteredBy")
+  authEvents   AuthEvent[]
+}
+
+// Audit trail of sign-in / sign-out events, written from NextAuth events.
+model AuthEvent {
+  id        String        @id @default(cuid())
+  userId    String
+  email     String
+  type      AuthEventType
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Membership {
@@ -99,6 +123,9 @@ model Account {
   type         AccountType @default(BANK)
   balanceCents Int         @default(0)
   currency     String      @default("MAD")
+  // The household's main account (e.g. where salary lands). At most one per
+  // household — the app clears the flag on others when a new primary is set.
+  isPrimary    Boolean     @default(false)
   createdAt    DateTime    @default(now())
 
   household      Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)

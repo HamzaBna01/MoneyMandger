@@ -5,6 +5,7 @@ import type { Dictionary } from "./dictionaries/en";
 // (root layout / pages); the resolved object is passed to the client provider.
 const loaders: Record<Locale, () => Promise<Dictionary>> = {
   en: () => import("./dictionaries/en").then((m) => m.en),
+  fr: () => import("./dictionaries/fr").then((m) => m.fr),
   ar: () => import("./dictionaries/ar").then((m) => m.ar),
   ary: () => import("./dictionaries/ary").then((m) => m.ary),
 };

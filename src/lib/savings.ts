@@ -39,9 +39,15 @@ export interface SavingsProjection {
     /** Total to reach by the deadline, derived as monthlyTarget × months. */
     targetCents: number;
     deadline: Date;
-    /** Projected balance on the goal's deadline at the current pace. */
+    /**
+     * Amount saved *since the goal was set* (currentCents − baseline, never
+     * negative). This — not the whole savings balance — is what counts toward
+     * the goal, so money set aside beforehand doesn't pre-fill the bar.
+     */
+    savedCents: number;
+    /** Projected saved-toward-goal amount on the deadline at the current pace. */
     projectedCents: number;
-    /** currentCents / targetCents, clamped to [0, 1] for the progress bar. */
+    /** savedCents / targetCents, clamped to [0, 1] for the progress bar. */
     progress: number;
     /** Still-needed amount (0 once the goal is met). */
     remainingCents: number;
@@ -58,6 +64,11 @@ export function buildSavingsProjection(opts: {
   /** The amount the household wants to save each month (drives the goal). */
   monthlyTargetCents?: number | null;
   goalDeadline?: Date | null;
+  /**
+   * Savings balance when the goal was set. Only what's saved beyond this counts
+   * toward the goal. Null/undefined (e.g. legacy goals) counts from zero.
+   */
+  goalBaselineCents?: number | null;
   now?: Date;
 }): SavingsProjection {
   const now = opts.now ?? new Date();
@@ -77,8 +88,15 @@ export function buildSavingsProjection(opts: {
     // one contribution.
     const months = monthsUntil(deadline, now) + 1;
     const targetCents = opts.monthlyTargetCents * months;
+    // Count only what's been saved since the goal was set — money already in
+    // the account at that moment (the baseline) doesn't count toward it.
+    const savedCents = Math.max(
+      0,
+      opts.currentCents - (opts.goalBaselineCents ?? 0)
+    );
+    // Project the saved-toward-goal amount forward at the current pace.
     const projectedCents = projectBalance(
-      opts.currentCents,
+      savedCents,
       opts.monthlyAvgCents,
       deadline,
       now
@@ -88,9 +106,10 @@ export function buildSavingsProjection(opts: {
       months,
       targetCents,
       deadline,
+      savedCents,
       projectedCents,
-      progress: Math.min(1, Math.max(0, opts.currentCents / targetCents)),
-      remainingCents: Math.max(0, targetCents - opts.currentCents),
+      progress: Math.min(1, Math.max(0, savedCents / targetCents)),
+      remainingCents: Math.max(0, targetCents - savedCents),
       onTrack: opts.monthlyAvgCents >= opts.monthlyTargetCents,
       shortfallCents: Math.max(0, opts.monthlyTargetCents - opts.monthlyAvgCents),
     };

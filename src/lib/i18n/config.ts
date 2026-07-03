@@ -1,6 +1,6 @@
 // i18n configuration — shared by server and client (no server-only imports here).
 
-export const locales = ["en", "ar", "ary"] as const;
+export const locales = ["en", "fr", "ar", "ary"] as const;
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "en";
@@ -8,6 +8,7 @@ export const defaultLocale: Locale = "en";
 /** Text direction per locale. Arabic and Darija (Arabic script) are RTL. */
 export const localeDir: Record<Locale, "ltr" | "rtl"> = {
   en: "ltr",
+  fr: "ltr",
   ar: "rtl",
   ary: "rtl",
 };
@@ -15,6 +16,7 @@ export const localeDir: Record<Locale, "ltr" | "rtl"> = {
 /** Native display names for the language switcher. */
 export const localeNames: Record<Locale, string> = {
   en: "English",
+  fr: "Français",
   ar: "العربية",
   ary: "الدارجة",
 };

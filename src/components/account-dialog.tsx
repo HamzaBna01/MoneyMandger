@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { ACCOUNT_TYPES } from "@/lib/accounts";
 import { useDict } from "@/components/i18n-provider";
 import {
@@ -35,6 +36,7 @@ export interface AccountInitial {
   name: string;
   type: string;
   amount: string;
+  isPrimary?: boolean;
 }
 
 function SubmitButton({ editing }: { editing: boolean }) {
@@ -60,12 +62,16 @@ export function AccountDialog({
   const [state, formAction] = useActionState<ActionState, FormData>(saveAccount, {});
   const [deleting, startDelete] = useTransition();
   const [type, setType] = useState("BANK");
+  const [isPrimary, setIsPrimary] = useState(false);
   const dict = useDict();
   const t = dict.accounts;
   const d = t.dialog;
 
   useEffect(() => {
-    if (open) setType(initial?.type ?? "BANK");
+    if (open) {
+      setType(initial?.type ?? "BANK");
+      setIsPrimary(initial?.isPrimary ?? false);
+    }
   }, [open, initial]);
 
   useEffect(() => {
@@ -90,6 +96,7 @@ export function AccountDialog({
 
         <form action={formAction} className="space-y-4">
           {editing && <input type="hidden" name="id" value={initial!.id} />}
+          <input type="hidden" name="isPrimary" value={isPrimary ? "1" : ""} />
 
           <div className="space-y-2">
             <Label htmlFor="name">{d.name}</Label>
@@ -140,6 +147,16 @@ export function AccountDialog({
               />
             </div>
           </div>
+
+          <label className="flex items-start justify-between gap-3 rounded-lg border p-3">
+            <span className="space-y-0.5">
+              <span className="block text-sm font-medium">{d.mainAccount}</span>
+              <span className="block text-xs text-muted-foreground">
+                {d.mainAccountHint}
+              </span>
+            </span>
+            <Switch checked={isPrimary} onCheckedChange={setIsPrimary} />
+          </label>
 
           <DialogFooter showCloseButton>
             {editing && (

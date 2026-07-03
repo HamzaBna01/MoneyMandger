@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
 import { Loader2, UserPlus, Trash2, Wallet, Coins, Tags } from "lucide-react";
@@ -21,6 +21,7 @@ import {
   updateHousehold,
   updateSavingsGoal,
   updateProfile,
+  changePassword,
   inviteMember,
   updateMemberRole,
   removeMember,
@@ -94,6 +95,10 @@ export function SettingsClient({
       <div className="grid gap-6 lg:grid-cols-2">
         <HouseholdCard household={household} disabled={!isOwner} />
         <ProfileCard profile={profile} />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ChangePasswordCard />
       </div>
 
       <SavingsGoalCard goal={savingsGoal} disabled={!isOwner} />
@@ -298,6 +303,70 @@ function ProfileCard({ profile }: { profile: { name: string; email: string } }) 
             <Input id="p-email" value={profile.email} disabled readOnly />
           </div>
           <SaveButton />
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChangePasswordCard() {
+  const [state, action] = useActionState<ActionState, FormData>(
+    changePassword,
+    {}
+  );
+  const t = useDict().settings;
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state.message) {
+      toast.success(state.message);
+      formRef.current?.reset();
+    } else if (state.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t.password.title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form ref={formRef} action={action} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="pw-current">{t.password.current}</Label>
+            <Input
+              id="pw-current"
+              name="currentPassword"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pw-new">{t.password.new}</Label>
+            <Input
+              id="pw-new"
+              name="newPassword"
+              type="password"
+              autoComplete="new-password"
+              minLength={6}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pw-confirm">{t.password.confirm}</Label>
+            <Input
+              id="pw-confirm"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              minLength={6}
+              required
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{t.password.hint}</p>
+          <SaveButton label={t.password.save} />
         </form>
       </CardContent>
     </Card>

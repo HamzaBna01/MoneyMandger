@@ -1,15 +1,18 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireHousehold } from "@/lib/session";
 import {
   householdSchema,
   profileSchema,
+  changePasswordSchema,
   inviteSchema,
   savingsGoalSchema,
 } from "@/lib/validations";
 import { parseToCents } from "@/lib/money";
+import { savingsBalance } from "@/lib/queries";
 import { getLocale } from "@/lib/i18n/server";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { fmt } from "@/lib/i18n/interpolate";
@@ -61,7 +64,7 @@ export async function updateSavingsGoal(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const { householdId, role } = await requireHousehold();
+  const { householdId, household, role } = await requireHousehold();
   const t = await settingsDict();
   if (!isOwner(role)) return { error: t.errors.ownerOnly };
 
@@ -75,11 +78,16 @@ export async function updateSavingsGoal(
 
   const rawAmount = parsed.data.amount?.trim();
 
-  // Empty amount → clear the goal entirely.
+  // Empty amount → clear the goal entirely (baseline too, so a fresh goal
+  // starts from the balance at that later moment).
   if (!rawAmount) {
     await prisma.household.update({
       where: { id: householdId },
-      data: { savingsMonthlyCents: null, savingsGoalDeadline: null },
+      data: {
+        savingsMonthlyCents: null,
+        savingsGoalDeadline: null,
+        savingsGoalBaselineCents: null,
+      },
     });
     revalidatePath("/settings");
     revalidatePath("/");
@@ -97,9 +105,21 @@ export async function updateSavingsGoal(
     if (isNaN(deadline.getTime())) return { error: t.errors.validTargetDate };
   }
 
+  // Capture the current savings balance as the baseline when a goal is first
+  // set, so money already put aside doesn't count toward it. Editing an
+  // existing goal keeps the original baseline (progress carries over).
+  const hasGoal = household.savingsMonthlyCents != null;
+  const baselineCents = hasGoal
+    ? household.savingsGoalBaselineCents
+    : await savingsBalance(householdId);
+
   await prisma.household.update({
     where: { id: householdId },
-    data: { savingsMonthlyCents: cents, savingsGoalDeadline: deadline },
+    data: {
+      savingsMonthlyCents: cents,
+      savingsGoalDeadline: deadline,
+      savingsGoalBaselineCents: baselineCents,
+    },
   });
 
   revalidatePath("/settings");
@@ -126,6 +146,40 @@ export async function updateProfile(
 
   revalidatePath("/settings");
   return { ok: true, message: t.toast.profileSaved };
+}
+
+export async function changePassword(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const { userId } = await requireHousehold();
+  const t = await settingsDict();
+
+  const parsed = changePasswordSchema.safeParse({
+    currentPassword: formData.get("currentPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? t.errors.invalidInput };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true },
+  });
+  if (!user) return { error: t.errors.invalidInput };
+
+  const ok = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
+  if (!ok) return { error: t.errors.currentPasswordWrong };
+
+  const passwordHash = await bcrypt.hash(parsed.data.newPassword, 10);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash },
+  });
+
+  return { ok: true, message: t.toast.passwordChanged };
 }
 
 export async function inviteMember(

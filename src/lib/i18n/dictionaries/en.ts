@@ -68,6 +68,9 @@ export const en = {
     vsLastMonth: "{pct}% vs last month",
     topSpending: "Top spending",
     noSpending: "No spending this month.",
+    mainAccount: "Main account",
+    noMainAccount: "No main account set yet.",
+    markMainAccount: "Mark one",
   },
   transactions: {
     title: "Transactions",
@@ -120,6 +123,7 @@ export const en = {
     summaryOne: "Total balance {amount} across {count} account.",
     summaryOther: "Total balance {amount} across {count} accounts.",
     add: "Add account",
+    mainBadge: "Main",
     dialog: {
       newTitle: "New account",
       editTitle: "Edit account",
@@ -129,6 +133,8 @@ export const en = {
       type: "Type",
       balance: "Balance",
       startingBalance: "Starting balance",
+      mainAccount: "Main account",
+      mainAccountHint: "Show this account's balance on your dashboard (e.g. where your salary lands).",
       submitAdd: "Add account",
       submitSave: "Save changes",
     },
@@ -235,6 +241,14 @@ export const en = {
     ownerOnly: "Only the household owner can change these.",
     yourProfile: "Your profile",
     email: "Email",
+    password: {
+      title: "Password",
+      current: "Current password",
+      new: "New password",
+      confirm: "Confirm new password",
+      hint: "Use at least 6 characters. You'll stay signed in after changing it.",
+      save: "Change password",
+    },
     members: "Members",
     you: "(you)",
     pendingInvites: "Pending invites",
@@ -267,6 +281,7 @@ export const en = {
     toast: {
       householdSaved: "Household updated",
       profileSaved: "Profile updated",
+      passwordChanged: "Password changed",
       savingsGoalSaved: "Savings goal updated",
       savingsGoalCleared: "Savings goal cleared",
       memberAdded: "{email} added to the household",
@@ -279,6 +294,7 @@ export const en = {
     errors: {
       ownerOnly: "Only the owner can change this.",
       invalidInput: "Invalid input",
+      currentPasswordWrong: "Current password is incorrect.",
       validGoalAmount: "Enter a valid goal amount greater than zero.",
       validTargetDate: "Enter a valid target date.",
       alreadyMember: "That person is already a member.",

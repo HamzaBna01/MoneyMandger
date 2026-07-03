@@ -67,6 +67,9 @@ export const ary: Dictionary = {
     vsLastMonth: "{pct}٪ على الشهر اللّي فات",
     topSpending: "أكثر المصاريف",
     noSpending: "ما كاين مصروف هاد الشهر.",
+    mainAccount: "الحساب الرئيسي",
+    noMainAccount: "مازال ما تحدّد حتى حساب رئيسي.",
+    markMainAccount: "حدّد واحد",
   },
   transactions: {
     title: "المعاملات",
@@ -119,6 +122,7 @@ export const ary: Dictionary = {
     summaryOne: "الرصيد الإجمالي {amount} ف حساب واحد.",
     summaryOther: "الرصيد الإجمالي {amount} ف {count} حسابات.",
     add: "زيد حساب",
+    mainBadge: "رئيسي",
     dialog: {
       newTitle: "حساب جديد",
       editTitle: "بدّل الحساب",
@@ -128,6 +132,8 @@ export const ary: Dictionary = {
       type: "النوع",
       balance: "الرصيد",
       startingBalance: "الرصيد البدائي",
+      mainAccount: "الحساب الرئيسي",
+      mainAccountHint: "بيّن الرصيد ديال هاد الحساب فالداشبورد (مثلا فين كيوصل الراتب ديالك).",
       submitAdd: "زيد حساب",
       submitSave: "سجّل التبديلات",
     },
@@ -232,6 +238,14 @@ export const ary: Dictionary = {
     ownerOnly: "غير مالك الأسرة لي يقدر يبدّل هادشي.",
     yourProfile: "الملف ديالك",
     email: "الإيميل",
+    password: {
+      title: "كلمة السر",
+      current: "كلمة السر الحالية",
+      new: "كلمة السر الجديدة",
+      confirm: "أكّد كلمة السر الجديدة",
+      hint: "استعمل 6 حروف على الأقل. غادي تبقى داخل حتى من بعد ما تبدّلها.",
+      save: "بدّل كلمة السر",
+    },
     members: "الأعضاء",
     you: "(نتا)",
     pendingInvites: "دعوات معلّقة",
@@ -264,6 +278,7 @@ export const ary: Dictionary = {
     toast: {
       householdSaved: "تبدّلات الأسرة",
       profileSaved: "تبدّل الملف",
+      passwordChanged: "تبدّلات كلمة السر",
       savingsGoalSaved: "تبدّل هدف التوفير",
       savingsGoalCleared: "تنحّى هدف التوفير",
       memberAdded: "تزاد {email} للأسرة",
@@ -276,6 +291,7 @@ export const ary: Dictionary = {
     errors: {
       ownerOnly: "غير مالك الأسرة لي يقدر يبدّل هادشي.",
       invalidInput: "إدخال ماشي صحيح",
+      currentPasswordWrong: "كلمة السر الحالية ماشي صحيحة.",
       validGoalAmount: "دخّل مبلغ هدف صحيح وكبر من صفر.",
       validTargetDate: "دخّل تاريخ مطلوب صحيح.",
       alreadyMember: "هاد الشخص راه عضو من قبل.",

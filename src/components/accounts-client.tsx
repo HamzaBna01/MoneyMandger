@@ -20,6 +20,7 @@ export interface AccountView {
   type: string;
   balanceCents: number;
   amountInput: string;
+  isPrimary: boolean;
 }
 
 export function AccountsClient({
@@ -73,6 +74,7 @@ export function AccountsClient({
                   name: a.name,
                   type: a.type,
                   amount: a.amountInput,
+                  isPrimary: a.isPrimary,
                 });
                 setOpen(true);
               }}
@@ -89,8 +91,15 @@ export function AccountsClient({
                     >
                       <Icon className="size-5" />
                     </span>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                      {t.types[a.type as keyof typeof t.types] ?? meta.label}
+                    <span className="flex items-center gap-1.5">
+                      {a.isPrimary && (
+                        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+                          {t.mainBadge}
+                        </span>
+                      )}
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        {t.types[a.type as keyof typeof t.types] ?? meta.label}
+                      </span>
                     </span>
                   </div>
                   <div>

@@ -67,6 +67,9 @@ export const ar: Dictionary = {
     vsLastMonth: "{pct}٪ مقارنةً بالشهر الماضي",
     topSpending: "أعلى المصروفات",
     noSpending: "لا مصروفات هذا الشهر.",
+    mainAccount: "الحساب الرئيسي",
+    noMainAccount: "لم يُحدَّد حساب رئيسي بعد.",
+    markMainAccount: "حدِّد واحدًا",
   },
   transactions: {
     title: "المعاملات",
@@ -119,6 +122,7 @@ export const ar: Dictionary = {
     summaryOne: "الرصيد الإجمالي {amount} عبر حساب واحد.",
     summaryOther: "الرصيد الإجمالي {amount} عبر {count} حسابات.",
     add: "إضافة حساب",
+    mainBadge: "رئيسي",
     dialog: {
       newTitle: "حساب جديد",
       editTitle: "تعديل الحساب",
@@ -128,6 +132,8 @@ export const ar: Dictionary = {
       type: "النوع",
       balance: "الرصيد",
       startingBalance: "الرصيد الافتتاحي",
+      mainAccount: "الحساب الرئيسي",
+      mainAccountHint: "أظهر رصيد هذا الحساب في لوحة التحكم (مثلاً حيث يصل راتبك).",
       submitAdd: "إضافة حساب",
       submitSave: "حفظ التغييرات",
     },
@@ -232,6 +238,14 @@ export const ar: Dictionary = {
     ownerOnly: "يمكن لمالك الأسرة فقط تغيير هذه الإعدادات.",
     yourProfile: "ملفك الشخصي",
     email: "البريد الإلكتروني",
+    password: {
+      title: "كلمة المرور",
+      current: "كلمة المرور الحالية",
+      new: "كلمة المرور الجديدة",
+      confirm: "تأكيد كلمة المرور الجديدة",
+      hint: "استخدم 6 أحرف على الأقل. ستبقى مسجّل الدخول بعد التغيير.",
+      save: "تغيير كلمة المرور",
+    },
     members: "الأعضاء",
     you: "(أنت)",
     pendingInvites: "دعوات معلّقة",
@@ -264,6 +278,7 @@ export const ar: Dictionary = {
     toast: {
       householdSaved: "تم تحديث الأسرة",
       profileSaved: "تم تحديث الملف الشخصي",
+      passwordChanged: "تم تغيير كلمة المرور",
       savingsGoalSaved: "تم تحديث هدف الادّخار",
       savingsGoalCleared: "تمت إزالة هدف الادّخار",
       memberAdded: "تمت إضافة {email} إلى الأسرة",
@@ -276,6 +291,7 @@ export const ar: Dictionary = {
     errors: {
       ownerOnly: "يمكن لمالك الأسرة فقط تغيير هذا.",
       invalidInput: "إدخال غير صالح",
+      currentPasswordWrong: "كلمة المرور الحالية غير صحيحة.",
       validGoalAmount: "أدخل مبلغ هدف صالحًا أكبر من صفر.",
       validTargetDate: "أدخل تاريخًا مستهدفًا صالحًا.",
       alreadyMember: "هذا الشخص عضو بالفعل.",

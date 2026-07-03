@@ -39,25 +39,48 @@ export async function saveAccount(
     return { error: "Enter a valid balance." };
   }
 
+  const isPrimary = formData.get("isPrimary") === "1";
+
   try {
     if (parsed.data.id) {
       const owned = await prisma.account.findFirst({
         where: { id: parsed.data.id, householdId },
       });
       if (!owned) return { error: "Account not found." };
-      await prisma.account.update({
-        where: { id: parsed.data.id },
-        data: { name: parsed.data.name, type: parsed.data.type, balanceCents },
-      });
+      // When marking this account primary, clear the flag on the others first
+      // so at most one account per household is ever the main one.
+      await prisma.$transaction([
+        ...(isPrimary
+          ? [
+              prisma.account.updateMany({
+                where: { householdId, isPrimary: true, id: { not: parsed.data.id } },
+                data: { isPrimary: false },
+              }),
+            ]
+          : []),
+        prisma.account.update({
+          where: { id: parsed.data.id },
+          data: { name: parsed.data.name, type: parsed.data.type, balanceCents, isPrimary },
+        }),
+      ]);
     } else {
-      await prisma.account.create({
-        data: {
-          householdId,
-          name: parsed.data.name,
-          type: parsed.data.type,
-          balanceCents,
-          currency: household.baseCurrency,
-        },
+      await prisma.$transaction(async (tx) => {
+        if (isPrimary) {
+          await tx.account.updateMany({
+            where: { householdId, isPrimary: true },
+            data: { isPrimary: false },
+          });
+        }
+        await tx.account.create({
+          data: {
+            householdId,
+            name: parsed.data.name,
+            type: parsed.data.type,
+            balanceCents,
+            currency: household.baseCurrency,
+            isPrimary,
+          },
+        });
       });
     }
   } catch (e) {

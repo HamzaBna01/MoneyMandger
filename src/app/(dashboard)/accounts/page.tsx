@@ -23,6 +23,7 @@ export default async function AccountsPage() {
         type: a.type,
         balanceCents: a.balanceCents,
         amountInput: centsToInput(a.balanceCents),
+        isPrimary: a.isPrimary,
       }))}
     />
   );

@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   await materializeDueRules(householdId);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <AppSidebar
         name={userName}
         email={userEmail}
@@ -42,7 +42,7 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 px-4 pb-24 pt-5 md:px-8 md:pb-8 md:pt-8">
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-24 pt-5 md:px-8 md:pb-8 md:pt-8">
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
