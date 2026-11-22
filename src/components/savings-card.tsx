@@ -10,6 +10,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries/en";
 import { fmt } from "@/lib/i18n/interpolate";
 import { dateLocale } from "@/lib/i18n/date-locale";
 import { cn } from "@/lib/utils";
+import { CountUp } from "@/components/fx/count-up";
 
 export function SavingsCard({
   projection,
@@ -34,7 +35,9 @@ export function SavingsCard({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Coins className="size-5 text-primary" />
+            <span className="flex size-8 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-inset ring-primary/25">
+              <Coins className="size-4" />
+            </span>
             {t.title}
           </CardTitle>
           {canEdit && (
@@ -50,9 +53,12 @@ export function SavingsCard({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-sm text-muted-foreground">{t.inSavings}</p>
-            <p className="text-2xl font-semibold tabular-nums">
-              {formatCents(currentCents, currency)}
-            </p>
+            <CountUp
+              cents={currentCents}
+              currency={currency}
+              delay={700}
+              className="font-display block text-3xl font-bold tabular-nums"
+            />
           </div>
           <div className="text-end">
             <p className="text-sm text-muted-foreground">{t.pace}</p>
@@ -74,7 +80,7 @@ export function SavingsCard({
         </div>
 
         {/* Year-end projection */}
-        <div className="rounded-lg bg-muted/50 px-3 py-2.5 text-sm text-muted-foreground">
+        <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 px-3 py-2.5 text-sm text-muted-foreground">
           {fmt(t.onPace, {
             amount: formatCents(yearEndCents, currency),
             year: yearLabel,
@@ -101,11 +107,13 @@ export function SavingsCard({
               </div>
               <OnTrackBadge onTrack={goal.onTrack} dict={dict} />
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
               <div
                 className={cn(
-                  "h-full rounded-full transition-all",
-                  goal.onTrack ? "bg-positive" : "bg-warning"
+                  "bar-fill h-full rounded-full",
+                  goal.onTrack
+                    ? "bg-gradient-to-r from-positive to-neon"
+                    : "bg-gradient-to-r from-warning to-negative/80"
                 )}
                 style={{ width: `${goal.progress * 100}%` }}
               />

@@ -55,7 +55,7 @@ npm install
 
 ### 2. Configure environment
 
-A `.env` is already included. Open it and check **`DATABASE_URL`**:
+Add `.env`. Open it and check **`DATABASE_URL`**:
 
 ```
 DATABASE_URL="mysql://root:@localhost:3306/barakah_dev"

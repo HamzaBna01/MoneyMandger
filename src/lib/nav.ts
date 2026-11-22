@@ -7,6 +7,7 @@ import {
   Repeat,
   Settings,
   Tags,
+  BadgeDollarSign,
   type LucideIcon,
 } from "lucide-react";
 
@@ -22,6 +23,7 @@ export interface NavItem {
   | "categories"
   | "reports"
   | "recurring"
+  | "credits"
   | "settings"
   | "home"
   | "activity";
@@ -36,14 +38,23 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/categories", labelKey: "categories", icon: Tags },
   { href: "/reports", labelKey: "reports", icon: PieChart },
   { href: "/recurring", labelKey: "recurring", icon: Repeat },
+  { href: "/credits", labelKey: "credits", icon: BadgeDollarSign },
   { href: "/settings", labelKey: "settings", icon: Settings },
 ];
 
-// Subset shown on the mobile bottom bar (plus a centered "+" add button).
+// Mobile dock: four tabs around a centered "+" button. Everything else lives
+// in the "More" sheet so the bar never gets crowded.
 export const MOBILE_NAV_ITEMS: NavItem[] = [
   { href: "/", labelKey: "home", icon: LayoutDashboard },
   { href: "/transactions", labelKey: "activity", icon: ArrowLeftRight },
   { href: "/accounts", labelKey: "accounts", icon: Wallet },
+];
+
+export const MOBILE_MORE_ITEMS: NavItem[] = [
   { href: "/budgets", labelKey: "budgets", icon: Target },
   { href: "/recurring", labelKey: "recurring", icon: Repeat },
+  { href: "/credits", labelKey: "credits", icon: BadgeDollarSign },
+  { href: "/categories", labelKey: "categories", icon: Tags },
+  { href: "/reports", labelKey: "reports", icon: PieChart },
+  { href: "/settings", labelKey: "settings", icon: Settings },
 ];

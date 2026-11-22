@@ -10,11 +10,11 @@ export function Logo({
 }) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+      <span className="flex size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_0_20px_-4px_var(--glow)]">
         <Wallet className="size-4.5" />
       </span>
       {showName && (
-        <span className="text-lg font-semibold tracking-tight">Barakah</span>
+        <span className="font-display text-lg font-bold">Barakah</span>
       )}
     </div>
   );

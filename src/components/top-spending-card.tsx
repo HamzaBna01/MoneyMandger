@@ -45,7 +45,7 @@ export function TopSpendingCard({
             {t.noSpending}
           </p>
         ) : (
-          categories.map((c) => {
+          categories.map((c, i) => {
             const share = totalCents > 0 ? (c.amountCents / totalCents) * 100 : 0;
             return (
               <div key={c.categoryId} className="space-y-1.5">
@@ -65,8 +65,8 @@ export function TopSpendingCard({
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={cn("h-full rounded-full bg-primary/70 transition-all")}
-                    style={{ width: `${Math.min(share, 100)}%` }}
+                    className={cn("bar-fill h-full rounded-full bg-gradient-to-r from-neon-2 to-neon")}
+                    style={{ width: `${Math.min(share, 100)}%`, "--i": i } as React.CSSProperties}
                   />
                 </div>
               </div>

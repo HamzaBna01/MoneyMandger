@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -56,6 +57,11 @@ enum Cadence {
   YEARLY
 }
 
+enum CreditDirection {
+  LENT
+  BORROWED
+}
+
 model Household {
   id                  String    @id @default(cuid())
   name                String
@@ -74,19 +80,23 @@ model Household {
   budgets        Budget[]
   recurringRules RecurringRule[]
   invites        Invite[]
+  contacts       Contact[]
+  credits        Credit[]
 }
 
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
   name         String
-  passwordHash String
+  passwordHash String?
   locale       String   @default("en")
   createdAt    DateTime @default(now())
 
-  memberships  Membership[]
-  transactions Transaction[] @relation("EnteredBy")
-  authEvents   AuthEvent[]
+  memberships          Membership[]
+  transactions         Transaction[] @relation("EnteredBy")
+  authEvents           AuthEvent[]
+  credits              Credit[]      @relation("CreatedBy")
+  passwordResetTokens  PasswordResetToken[]
 }
 
 // Audit trail of sign-in / sign-out events, written from NextAuth events.
@@ -103,6 +113,22 @@ model AuthEvent {
   @@index([createdAt])
 }
 
+// One-time tokens for the forgot-password flow. The raw token is never stored —
+// only a SHA-256 hash — and each row expires or is marked used after a reset.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 model Membership {
   id          String @id @default(cuid())
   householdId String
@@ -114,6 +140,59 @@ model Membership {
 
   @@unique([householdId, userId])
   @@index([userId])
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  householdId String
+  name        String
+  phone       String?
+  email       String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  credits   Credit[]
+
+  @@unique([householdId, name])
+  @@index([householdId])
+}
+
+model Credit {
+  id           String          @id @default(cuid())
+  householdId  String
+  contactId    String
+  createdById  String
+  direction    CreditDirection @default(LENT)
+  description  String?
+  totalCents   Int
+  paidCents    Int             @default(0)
+  dueDate      DateTime?
+  currency     String          @default("MAD")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  contact   Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  createdBy User      @relation("CreatedBy", fields: [createdById], references: [id])
+  payments  CreditPayment[]
+
+  @@index([householdId])
+  @@index([contactId])
+  @@index([createdById])
+}
+
+model CreditPayment {
+  id          String   @id @default(cuid())
+  creditId    String
+  amountCents Int
+  paidAt      DateTime @default(now())
+  note        String?
+  createdAt   DateTime @default(now())
+
+  credit Credit @relation(fields: [creditId], references: [id], onDelete: Cascade)
+
+  @@index([creditId])
 }
 
 model Account {

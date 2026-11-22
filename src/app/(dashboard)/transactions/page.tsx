@@ -45,7 +45,7 @@ export default async function TransactionsPage({
   const where: Record<string, unknown> = { account: { householdId } };
   if (accountId) where.accountId = accountId;
   if (categoryId) where.categoryId = categoryId;
-  if (q) where.note = { contains: q };
+  if (q) where.note = { contains: q, mode: "insensitive" };
   if (month) {
     const { start, end } = monthRange(month);
     where.date = { gte: start, lte: end };

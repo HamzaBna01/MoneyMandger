@@ -26,7 +26,7 @@ export function AppSidebar({
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-e bg-sidebar md:flex">
+    <aside className="hidden w-64 shrink-0 flex-col border-e bg-sidebar backdrop-blur-2xl md:flex">
       <div className="flex items-center justify-between px-5 py-4">
         <Logo />
         <div className="flex items-center gap-1">
@@ -35,7 +35,7 @@ export function AppSidebar({
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-2">
+      <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item.href);
           return (
@@ -43,13 +43,16 @@ export function AppSidebar({
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-300",
                 active
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
             >
-              <item.icon className="size-4.5" />
+              {active && (
+                <span className="nav-active-bar absolute inset-y-2 start-0 w-1 rounded-full bg-primary" />
+              )}
+              <item.icon className="size-4.5 transition-transform duration-300 group-hover:scale-110" />
               {dict.nav[item.labelKey]}
             </Link>
           );

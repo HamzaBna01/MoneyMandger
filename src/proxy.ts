@@ -5,7 +5,7 @@ import { authConfig } from "@/lib/auth.config";
 // Next 16 renamed the "middleware" convention to "proxy" (same behaviour).
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;

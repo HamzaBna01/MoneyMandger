@@ -52,9 +52,9 @@ export function BudgetBar({ data }: { data: BudgetBarData }) {
           </p>
         </div>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-all", s.bar)}
+          className={cn("bar-fill h-full rounded-full", s.bar)}
           style={{ width: `${clamped}%` }}
         />
       </div>

@@ -37,7 +37,7 @@ export function UserChip({
   const t = useDict().nav;
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-full items-center gap-3 rounded-lg border bg-card p-2 text-left transition-colors hover:bg-accent">
+      <DropdownMenuTrigger className="flex w-full items-center gap-3 rounded-xl border bg-card p-2 text-start backdrop-blur transition-colors hover:bg-accent">
         <Avatar className="size-9">
           <AvatarFallback className="bg-primary/15 text-sm font-medium text-primary">
             {initials(name)}

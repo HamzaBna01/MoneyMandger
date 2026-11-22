@@ -58,8 +58,8 @@ export function TransactionRow({
           : undefined
       }
       className={cn(
-        "flex items-center gap-3 rounded-lg px-2 py-2",
-        interactive && "cursor-pointer hover:bg-accent"
+        "flex items-center gap-3 rounded-xl px-2 py-2 transition-all duration-300 hover:translate-x-1 hover:bg-accent rtl:hover:-translate-x-1",
+        interactive && "cursor-pointer"
       )}
     >
       <CategoryIcon icon={tx.iconKey} />

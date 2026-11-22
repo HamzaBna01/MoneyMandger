@@ -170,14 +170,21 @@ export async function changePassword(
   });
   if (!user) return { error: t.errors.invalidInput };
 
+  if (!user.passwordHash) return { error: t.errors.passwordResetRequired };
+
   const ok = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
   if (!ok) return { error: t.errors.currentPasswordWrong };
 
   const passwordHash = await bcrypt.hash(parsed.data.newPassword, 10);
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash },
-  });
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    }),
+    prisma.passwordResetToken.deleteMany({
+      where: { userId, usedAt: null },
+    }),
+  ]);
 
   return { ok: true, message: t.toast.passwordChanged };
 }

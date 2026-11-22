@@ -4,15 +4,25 @@ import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
-import { signupSchema, loginSchema } from "@/lib/validations";
+import { signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from "@/lib/validations";
 import { DEFAULT_CATEGORIES } from "@/lib/categories";
 import { getLocale } from "@/lib/i18n/server";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { setLocaleCookie } from "@/lib/i18n/actions";
 import { isLocale } from "@/lib/i18n/config";
+import { headers } from "next/headers";
+import {
+  generateResetToken,
+  hashResetToken,
+  isResetTokenUsable,
+  resetTokenExpiresAt,
+} from "@/lib/password-reset";
 
 export interface AuthFormState {
   error?: string;
+  success?: string;
+  resetUrl?: string;
+  oauthResetUrl?: string;
 }
 
 export async function loginAction(
@@ -106,4 +116,101 @@ export async function signupAction(
     throw err;
   }
   return {};
+}
+
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  return host ? `${proto}://${host}` : "";
+}
+
+export async function requestPasswordResetAction(
+  _prev: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const dict = await getDictionary(await getLocale());
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? dict.auth.invalidInput };
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email: parsed.data.email },
+    select: { id: true, passwordHash: true },
+  });
+
+  if (!user) {
+    return { success: dict.auth.resetEmailSent };
+  }
+
+  if (!user.passwordHash) {
+    return {
+      success: dict.auth.oauthResetInstructions,
+      oauthResetUrl: "https://accounts.google.com/signin/recovery",
+    };
+  }
+
+  const token = generateResetToken();
+  const tokenHash = hashResetToken(token);
+  const expiresAt = resetTokenExpiresAt();
+
+  await prisma.$transaction([
+    prisma.passwordResetToken.deleteMany({
+      where: { userId: user.id, usedAt: null },
+    }),
+    prisma.passwordResetToken.create({
+      data: { userId: user.id, tokenHash, expiresAt },
+    }),
+  ]);
+
+  const origin = await requestOrigin();
+  const resetUrl = `${origin || ""}/reset-password?token=${encodeURIComponent(token)}`;
+
+  // Invites are local-only too: no mailer is wired up, so the link is shown
+  // on this screen when the account exists.
+  return { success: dict.auth.resetEmailSent, resetUrl };
+}
+
+export async function resetPasswordAction(
+  _prev: AuthFormState,
+  formData: FormData
+): Promise<AuthFormState> {
+  const dict = await getDictionary(await getLocale());
+  const parsed = resetPasswordSchema.safeParse({
+    token: formData.get("token"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? dict.auth.invalidInput };
+  }
+
+  const tokenHash = hashResetToken(parsed.data.token);
+  const row = await prisma.passwordResetToken.findUnique({
+    where: { tokenHash },
+  });
+  if (!row || !isResetTokenUsable(row)) {
+    return { error: dict.auth.resetInvalid };
+  }
+
+  const passwordHash = await bcrypt.hash(parsed.data.newPassword, 10);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: row.userId },
+      data: { passwordHash },
+    }),
+    prisma.passwordResetToken.update({
+      where: { id: row.id },
+      data: { usedAt: new Date() },
+    }),
+    prisma.passwordResetToken.deleteMany({
+      where: { userId: row.userId, usedAt: null, id: { not: row.id } },
+    }),
+  ]);
+
+  return { success: dict.auth.resetSuccess };
 }

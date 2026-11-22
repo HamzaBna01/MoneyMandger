@@ -21,7 +21,7 @@ export function MetricCard({
   delta,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon: LucideIcon;
   tone?: "default" | "positive" | "negative";
   hint?: string;
@@ -29,21 +29,21 @@ export function MetricCard({
 }) {
   const Arrow = delta?.up ? ArrowUp : ArrowDown;
   return (
-    <Card>
+    <Card className="h-full justify-center">
       <CardContent className="flex items-center gap-4 p-5">
         <span
           className={cn(
-            "flex size-11 items-center justify-center rounded-xl",
-            tone === "positive" && "bg-positive/15 text-positive",
-            tone === "negative" && "bg-negative/15 text-negative",
-            tone === "default" && "bg-primary/15 text-primary"
+            "relative flex size-12 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset",
+            tone === "positive" && "bg-positive/12 text-positive ring-positive/25 dark:shadow-[0_0_24px_-6px_var(--positive)]",
+            tone === "negative" && "bg-negative/12 text-negative ring-negative/25 dark:shadow-[0_0_24px_-6px_var(--negative)]",
+            tone === "default" && "bg-primary/12 text-primary ring-primary/25 dark:shadow-[0_0_24px_-6px_var(--primary)]"
           )}
         >
           <Icon className="size-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="truncate text-xl font-semibold tabular-nums">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+          <p className="font-display truncate text-2xl font-bold tabular-nums">{value}</p>
           {delta ? (
             <p
               className={cn(

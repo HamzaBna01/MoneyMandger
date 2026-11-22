@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude extension
+Claude
+
+# local dev environment (AI assistant notes, migration backups)
+CLAUDE.md
+AGENTS.md
+memory/
+prisma/migrations-mysql-backup/

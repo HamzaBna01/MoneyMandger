@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Starfield } from "@/components/fx/starfield";
 
 // Every dashboard route is per-user (reads the session cookie), so never cache.
 export const dynamic = "force-dynamic";
@@ -25,7 +26,8 @@ export default async function DashboardLayout({
   await materializeDueRules(householdId);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="relative isolate flex h-screen overflow-hidden">
+      <Starfield className="-z-10" />
       <AppSidebar
         name={userName}
         email={userEmail}
@@ -34,7 +36,7 @@ export default async function DashboardLayout({
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="flex items-center justify-between border-b px-4 py-3 md:hidden">
+        <header className="flex items-center justify-between border-b bg-background/60 px-4 py-3 backdrop-blur-xl md:hidden">
           <Logo />
           <div className="flex items-center gap-1">
             <LanguageSwitcher />
@@ -42,7 +44,7 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-24 pt-5 md:px-8 md:pb-8 md:pt-8">
+        <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-28 pt-5 md:px-8 md:pb-8 md:pt-8">
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
